@@ -100,6 +100,7 @@ public class RtlMaterialSpinner extends AppCompatSpinner implements ValueAnimato
     private float arrowSize;
     private boolean enableErrorLabel;
     private boolean enableFloatingLabel;
+    private boolean showFloatingLabelForever;
     private boolean isRtl;
 
     private HintAdapter hintAdapter;
@@ -173,6 +174,7 @@ public class RtlMaterialSpinner extends AppCompatSpinner implements ValueAnimato
         arrowSize = array.getDimension(R.styleable.RtlMaterialSpinner_ms_arrowSize, dpToPx(DEFAULT_ARROW_WIDTH_DP));
         enableErrorLabel = array.getBoolean(R.styleable.RtlMaterialSpinner_ms_enableErrorLabel, true);
         enableFloatingLabel = array.getBoolean(R.styleable.RtlMaterialSpinner_ms_enableFloatingLabel, true);
+        showFloatingLabelForever = array.getBoolean(R.styleable.RtlMaterialSpinner_ms_showFloatingLabelForever, true);
         isRtl = array.getBoolean(R.styleable.RtlMaterialSpinner_ms_isRtl, false);
 
         String typefacePath = array.getString(R.styleable.RtlMaterialSpinner_ms_typeface);
@@ -425,8 +427,10 @@ public class RtlMaterialSpinner extends AppCompatSpinner implements ValueAnimato
             } else {
                 textPaint.setColor(isEnabled() ? floatingLabelColor : disabledColor);
             }
-            if (floatingLabelAnimator.isRunning() || !floatingLabelVisible) {
-                textPaint.setAlpha((int) ((0.8 * floatingLabelPercent + 0.2) * baseAlpha * floatingLabelPercent));
+            if (!showFloatingLabelForever) {
+                if (floatingLabelAnimator.isRunning() || !floatingLabelVisible) {
+                    textPaint.setAlpha((int) ((0.8 * floatingLabelPercent + 0.2) * baseAlpha * floatingLabelPercent));
+                }
             }
             String textToDraw = floatingLabelText != null ? floatingLabelText.toString() : hint.toString();
             if (isRtl) {
@@ -502,7 +506,8 @@ public class RtlMaterialSpinner extends AppCompatSpinner implements ValueAnimato
                     if (!floatingLabelVisible && position != 0) {
                         showFloatingLabel();
                     } else if (floatingLabelVisible && position == 0) {
-                        hideFloatingLabel();
+                        if (showFloatingLabelForever) showFloatingLabel();
+                        else hideFloatingLabel();
                     }
                 }
 
